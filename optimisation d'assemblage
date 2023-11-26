@@ -101,7 +101,6 @@ int main() {
     free(V_precedence);
     free(V_operation);
     free(V_final);
-
     return 0;
 }
 
