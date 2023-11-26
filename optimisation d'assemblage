@@ -6,7 +6,103 @@ void precedence_algorithm(int V[], int A[][2], int n);
 void operation_algorithm(int V[], double tj[], int n, double T0);
 void print_results(int V[], int n);
 
+int main() {
 
+    FILE *file_exclusion = fopen("exclusion.txt", "r");
+    if (file_exclusion == NULL) {
+        fprintf(stderr, "Erreur lors de l'ouverture du fichier exclusion.txt\n");
+        return 1;
+    }
+
+    int n_exclusion, i, j;
+    fscanf(file_exclusion, "%d", &n_exclusion);
+
+    int (*E)[2] = malloc(n_exclusion * sizeof(int[2]));
+
+    for (int k = 0; k < n_exclusion; k++) {
+        fscanf(file_exclusion, "%d %d", &i, &j);
+        E[k][0] = i;
+        E[k][1] = j;
+    }
+
+    fclose(file_exclusion);
+
+    int *V_exclusion = malloc(n_exclusion * sizeof(int));
+    exclusion_algorithm(V_exclusion, E, n_exclusion);
+
+    FILE *file_precedence = fopen("precedences.txt", "r");
+    if (file_precedence == NULL) {
+        fprintf(stderr, "Erreur lors de l'ouverture du fichier precedences.txt\n");
+        return 1;
+    }
+
+    int n_precedence;
+    fscanf(file_precedence, "%d", &n_precedence);
+
+    int (*A)[2] = malloc(n_precedence * sizeof(int[2]));
+
+    for (int k = 0; k < n_precedence; k++) {
+        fscanf(file_precedence, "%d %d", &i, &j);
+        A[k][0] = i;
+        A[k][1] = j;
+    }
+
+    fclose(file_precedence);
+
+    int *V_precedence = malloc(n_precedence * sizeof(int));
+    precedence_algorithm(V_precedence, A, n_precedence);
+
+    FILE *file_operation = fopen("operation.txt", "r");
+    if (file_operation == NULL) {
+        fprintf(stderr, "Erreur lors de l'ouverture du fichier operation.txt\n");
+        return 1;
+    }
+
+    int n_operation;
+    fscanf(file_operation, "%d", &n_operation);
+
+    int *V_operation = malloc(n_operation * sizeof(int));
+    double *tj = malloc(n_operation * sizeof(double));
+
+    for (int k = 0; k < n_operation; k++) {
+        fscanf(file_operation, "%d %lf", &i, &tj[k]);
+    }
+
+    fclose(file_operation);
+
+    double T0;
+    FILE *file_temps_cycle = fopen("temps_cycle.txt", "r");
+    if (file_temps_cycle == NULL) {
+        fprintf(stderr, "Erreur lors de l'ouverture du fichier temps_cycle.txt\n");
+        return 1;
+    }
+    fscanf(file_temps_cycle, "%lf", &T0);
+    fclose(file_temps_cycle);
+
+    operation_algorithm(V_operation, tj, n_operation, T0);
+
+    int n_max = n_exclusion;
+    if (n_precedence > n_max) n_max = n_precedence;
+    if (n_operation > n_max) n_max = n_operation;
+
+    int *V_final = malloc(n_max * sizeof(int));
+
+    for (int k = 0; k < n_max; k++) {
+        if (k < n_exclusion) V_final[k] = V_exclusion[k];
+        if (k < n_precedence) V_final[k] = V_precedence[k];
+        if (k < n_operation) V_final[k] = V_operation[k];
+    }
+    print_results(V_final, n_max);
+
+    return 0;
+}
+
+void print_results(int V[], int n) {
+    printf("Répartition des opérations par station :\n");
+    for (int op = 0; op < n; op++) {
+        printf("Opération %d affectée à la station %d\n", op + 1, V[op]);
+    }
+}
 
 
 
