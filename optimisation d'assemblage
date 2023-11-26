@@ -94,6 +94,14 @@ int main() {
     }
     print_results(V_final, n_max);
 
+    free(E);
+    free(A);
+    free(tj);
+    free(V_exclusion);
+    free(V_precedence);
+    free(V_operation);
+    free(V_final);
+
     return 0;
 }
 
